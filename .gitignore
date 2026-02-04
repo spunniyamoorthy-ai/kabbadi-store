@@ -2,12 +2,6 @@
 .DS_Store
 .AppleDouble
 .LSOverride
-.DS_Store?
-
-# macOS/Windows Thumbnails/Trash
-.Trashes
-ehthumbs.db
-Thumbs.db
 
 # Editor / IDE
 .vscode/
@@ -15,7 +9,7 @@ Thumbs.db
 *.sublime-workspace
 *.sublime-project
 
-# Node / JavaScript
+# Node / JS
 node_modules/
 npm-debug.log*
 yarn-error.log
@@ -24,12 +18,15 @@ dist/
 build/
 .cache/
 
-# React Native / Expo
+# React Native / Expo / Twilio apps
 android/
 ios/
 .expo/
 .expo-shared/
-*.keystore
+.twilio-cli/
+.twilio/
+.twilio-voice-react-native-app/
+twilio-webrtc-sip-dialer/
 
 # Xcode / iOS
 *.xcworkspace
@@ -50,11 +47,8 @@ vendor/bundle
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-env/
 venv/
-ENV/
+env/
 
 # Logs and runtime
 *.log
@@ -66,14 +60,6 @@ ENV/
 .env
 .env.local
 .env.*.local
-.env.test
-.env.production
-
-# Twilio / CLI / config
-.twilio-cli/
-.claude.json
-.claude/
-.twilio/
 
 # Misc
 *.swp
@@ -81,6 +67,3 @@ ENV/
 *.zip
 *.tar.gz
 *.bak
-
-# macOS Finder files
-*.DS_Store
