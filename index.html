@@ -39,10 +39,17 @@
                 <span class="text-2xl font-bold tracking-wide">Kabbadi Kicks</span>
             </div>
             <div class="flex items-center space-x-6">
+                <!-- Login Button -->
                 <button onclick="loginUser()" class="hover:text-orange-400 transition" id="loginBtn">
-                    <i class="fa-solid fa-user mr-1"></i> <span id="usernameDisplay">Login</span>
+                    <i class="fa-solid fa-right-to-bracket mr-1"></i> <span>Login</span>
                 </button>
-                <div class="relative cursor-pointer">
+                
+                <!-- NEW Register Button -->
+                <button onclick="registerUser()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-full transition font-semibold" id="registerBtn">
+                    <i class="fa-solid fa-user-plus mr-1"></i> Register
+                </button>
+
+                <div class="relative cursor-pointer ml-2">
                     <i class="fa-solid fa-cart-shopping text-xl hover:text-orange-400 transition"></i>
                     <span id="cartCount" class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
                 </div>
@@ -60,6 +67,11 @@
             </button>
         </div>
     </header>
+
+    <!-- Status Bar for Testing -->
+    <div class="bg-blue-50 border-b border-blue-100 py-2 text-center text-sm text-blue-800">
+        <span id="statusMessage">👋 Welcome! Browse anonymously or Login/Register to track User ID.</span>
+    </div>
 
     <!-- Products Grid -->
     <section id="products" class="container mx-auto px-6 py-16">
@@ -162,41 +174,66 @@
         let cartTotal = 0;
         let cartItems = 0;
 
-        // 1. IDENTIFY CALL
-        function loginUser() {
-            // Arrays for random data generation
+        // HELPER: Generate Random User Data
+        function generateRandomUser() {
             const firstNames = ["Arjun", "Rahul", "Priya", "Anjali", "Vikram", "Sneha", "Rohan", "Kavita", "Amit", "Neha"];
             const lastNames = ["Sharma", "Verma", "Patel", "Singh", "Reddy", "Nair", "Iyer", "Khan", "Gupta", "Malhotra"];
             const teams = ["Patna Pirates", "Jaipur Pink Panthers", "U Mumba", "Bengaluru Bulls", "Puneri Paltan"];
             const positions = ["Raider", "Defender", "All Rounder"];
 
-            // Generate random values
             const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
             const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
-            const randomName = `${randomFirst} ${randomLast}`;
             const randomNumber = Math.floor(Math.random() * 10000);
-            
-            // Create a unique email and ID
-            const userEmail = `${randomFirst.toLowerCase()}.${randomLast.toLowerCase()}${randomNumber}@example.com`;
-            const userId = `user_${randomNumber}_${Date.now()}`; // Unique ID based on time
-            const randomTeam = teams[Math.floor(Math.random() * teams.length)];
-            const randomPosition = positions[Math.floor(Math.random() * positions.length)];
-            
-            // Segment Identify Call
-            analytics.identify(userId, {
-                name: randomName,
-                email: userEmail,
-                position: randomPosition,
-                team: randomTeam
-            });
 
-            document.getElementById('usernameDisplay').innerText = randomFirst;
-            alert(`Identify call sent for ${randomName} (${userEmail})`);
+            return {
+                name: `${randomFirst} ${randomLast}`,
+                email: `${randomFirst.toLowerCase()}.${randomLast.toLowerCase()}${randomNumber}@example.com`,
+                userId: `user_${randomNumber}_${Date.now()}`,
+                team: teams[Math.floor(Math.random() * teams.length)],
+                position: positions[Math.floor(Math.random() * positions.length)]
+            };
         }
 
-        // 2. TRACK CALL: Product Viewed
+        // 1. LOGIN (Identify only)
+        function loginUser() {
+            const user = generateRandomUser();
+            
+            // Just Identify
+            analytics.identify(user.userId, {
+                name: user.name,
+                email: user.email,
+                position: user.position,
+                team: user.team,
+                loginMethod: 'Standard'
+            });
+
+            document.getElementById('statusMessage').innerText = `✅ Logged in as ${user.name} (ID: ${user.userId})`;
+            alert(`Identify Call Sent!\nUser: ${user.name}\nID: ${user.userId}`);
+        }
+
+        // 2. REGISTER (Alias + Identify)
+        function registerUser() {
+            const user = generateRandomUser();
+
+            // STEP A: Alias (Link anonymous ID to new User ID)
+            // This ensures previous anonymous page views are linked to this new user
+            analytics.alias(user.userId);
+
+            // STEP B: Identify (Send traits for the new user)
+            analytics.identify(user.userId, {
+                name: user.name,
+                email: user.email,
+                position: user.position,
+                team: user.team,
+                signupMethod: 'Web Form'
+            });
+
+            document.getElementById('statusMessage').innerText = `🎉 Registered & Aliased as ${user.name} (ID: ${user.userId})`;
+            alert(`Alias + Identify Calls Sent!\nUser: ${user.name}\nID: ${user.userId}\n(Anonymous history now merged)`);
+        }
+
+        // 3. TRACK CALL: Product Viewed
         function viewProduct(name, id, price) {
-            // Segment Track Call
             analytics.track('Product Viewed', {
                 product_id: id,
                 name: name,
@@ -205,16 +242,15 @@
                 category: 'Footwear'
             });
             console.log(`Tracked View: ${name}`);
-            alert(`Event: Product Viewed (${name}) sent! Check debugger.`);
+            alert(`Event: Product Viewed (${name}) sent!`);
         }
 
-        // 3. TRACK CALL: Product Added
+        // 4. TRACK CALL: Product Added
         function addToCart(name, id, price) {
             cartTotal += price;
             cartItems += 1;
             document.getElementById('cartCount').innerText = cartItems;
 
-            // Segment Track Call
             analytics.track('Product Added', {
                 cart_id: 'cart_session_99',
                 product_id: id,
@@ -226,7 +262,7 @@
             alert(`Event: Product Added (${name}) sent!`);
         }
 
-        // 4. TRACK CALL: Order Completed
+        // 5. TRACK CALL: Order Completed
         function checkout() {
             if(cartItems === 0) {
                 alert("Add items to cart first!");
@@ -235,19 +271,17 @@
 
             const orderId = "order_" + Math.floor(Math.random() * 10000);
 
-            // Segment Track Call
             analytics.track('Order Completed', {
                 order_id: orderId,
                 total: cartTotal,
                 currency: 'USD',
                 products: [
-                    { product_id: 'P-101', name: 'Raider Pro X1', price: 89.00 } // Simplified for demo
+                    { product_id: 'P-101', name: 'Raider Pro X1', price: 89.00 }
                 ]
             });
             
             alert(`Event: Order Completed (ID: ${orderId}) sent! Total: $${cartTotal}`);
             
-            // Reset Cart
             cartItems = 0;
             cartTotal = 0;
             document.getElementById('cartCount').innerText = 0;
