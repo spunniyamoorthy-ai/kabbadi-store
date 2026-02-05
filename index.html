@@ -164,19 +164,34 @@
 
         // 1. IDENTIFY CALL
         function loginUser() {
-            const userEmail = "pro.raider@example.com";
-            const userId = "user_123_kabaddi";
+            // Arrays for random data generation
+            const firstNames = ["Arjun", "Rahul", "Priya", "Anjali", "Vikram", "Sneha", "Rohan", "Kavita", "Amit", "Neha"];
+            const lastNames = ["Sharma", "Verma", "Patel", "Singh", "Reddy", "Nair", "Iyer", "Khan", "Gupta", "Malhotra"];
+            const teams = ["Patna Pirates", "Jaipur Pink Panthers", "U Mumba", "Bengaluru Bulls", "Puneri Paltan"];
+            const positions = ["Raider", "Defender", "All Rounder"];
+
+            // Generate random values
+            const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
+            const randomName = `${randomFirst} ${randomLast}`;
+            const randomNumber = Math.floor(Math.random() * 10000);
+            
+            // Create a unique email and ID
+            const userEmail = `${randomFirst.toLowerCase()}.${randomLast.toLowerCase()}${randomNumber}@example.com`;
+            const userId = `user_${randomNumber}_${Date.now()}`; // Unique ID based on time
+            const randomTeam = teams[Math.floor(Math.random() * teams.length)];
+            const randomPosition = positions[Math.floor(Math.random() * positions.length)];
             
             // Segment Identify Call
             analytics.identify(userId, {
-                name: "Pardeep Narwal",
+                name: randomName,
                 email: userEmail,
-                position: "Raider",
-                team: "Patna Pirates"
+                position: randomPosition,
+                team: randomTeam
             });
 
-            document.getElementById('usernameDisplay').innerText = "Pardeep";
-            alert(`Identify call sent for ${userEmail}`);
+            document.getElementById('usernameDisplay').innerText = randomFirst;
+            alert(`Identify call sent for ${randomName} (${userEmail})`);
         }
 
         // 2. TRACK CALL: Product Viewed
