@@ -171,8 +171,9 @@
 
     <!-- LOGIC FOR EVENTS -->
     <script>
+        // CHANGED: Cart is now an Array to track specific items
+        let cart = []; 
         let cartTotal = 0;
-        let cartItems = 0;
 
         // HELPER: Generate Random User Data
         function generateRandomUser() {
@@ -250,9 +251,17 @@
 
         // 4. TRACK CALL: Product Added
         function addToCart(name, id, price) {
+            // CHANGED: Add item to the Cart Array
+            cart.push({
+                product_id: id,
+                name: name,
+                price: price
+            });
+            
             cartTotal += price;
-            cartItems += 1;
-            document.getElementById('cartCount').innerText = cartItems;
+            
+            // Update UI count based on array length
+            document.getElementById('cartCount').innerText = cart.length;
 
             analytics.track('Product Added', {
                 cart_id: 'cart_session_99',
@@ -267,25 +276,25 @@
 
         // 5. TRACK CALL: Order Completed
         function checkout() {
-            if(cartItems === 0) {
+            if(cart.length === 0) {
                 alert("Add items to cart first!");
                 return;
             }
 
             const orderId = "order_" + Math.floor(Math.random() * 10000);
 
+            // CHANGED: Send the ACTUAL items from the cart array
             analytics.track('Order Completed', {
                 order_id: orderId,
                 total: cartTotal,
                 currency: 'USD',
-                products: [
-                    { product_id: 'P-101', name: 'Raider Pro X1', price: 89.00 }
-                ]
+                products: cart // <--- Now sends exactly what you clicked
             });
             
-            alert(`Event: Order Completed (ID: ${orderId}) sent! Total: $${cartTotal}`);
+            alert(`Event: Order Completed (ID: ${orderId}) sent!\nItems: ${cart.map(i => i.name).join(', ')}`);
             
-            cartItems = 0;
+            // Reset Cart
+            cart = [];
             cartTotal = 0;
             document.getElementById('cartCount').innerText = 0;
         }
