@@ -20,7 +20,7 @@
       !function(){var i="analytics",analytics=window[i]=window[i]||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","screen","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware","register"];analytics.factory=function(e){return function(){if(window[i].initialized)return window[i][e].apply(window[i],arguments);var n=Array.prototype.slice.call(arguments);if(["track","screen","alias","group","page","identify"].indexOf(e)>-1){var c=document.querySelector("script[type='text/javascript']");n.push({__t:c.getAttribute("data-src")});}var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/"+key+"/analytics.min.js";var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r);analytics._loadOptions=n;}};for(var n=0;n<analytics.methods.length;n++){var key=analytics.methods[n];analytics[key]=analytics.factory(key);}analytics.load=function(key,n){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r);analytics._loadOptions=n;};analytics._writeKey="YOUR_WRITE_KEY";;analytics.SNIPPET_VERSION="4.15.3";
       
       // ------------------------------------------------------
-      // TODO: REPLACE 'YOUR_WRITE_KEY' BELOW WITH YOUR ACTUAL KEY
+      // TODO: VERIFY YOUR WRITE KEY IS CORRECT
       // ------------------------------------------------------
       analytics.load("61caoAh65ou6q3M7xHTDgJ2fI7oHTUre");
       
@@ -190,7 +190,8 @@
                 email: `${randomFirst.toLowerCase()}.${randomLast.toLowerCase()}${randomNumber}@example.com`,
                 userId: `user_${randomNumber}_${Date.now()}`,
                 team: teams[Math.floor(Math.random() * teams.length)],
-                position: positions[Math.floor(Math.random() * positions.length)]
+                position: positions[Math.floor(Math.random() * positions.length)],
+                phone: "+13084743939" // HARDCODED for Demo so calls route to you
             };
         }
 
@@ -202,13 +203,14 @@
             analytics.identify(user.userId, {
                 name: user.name,
                 email: user.email,
+                phone: user.phone,
                 position: user.position,
                 team: user.team,
                 loginMethod: 'Standard'
             });
 
             document.getElementById('statusMessage').innerText = `✅ Logged in as ${user.name} (ID: ${user.userId})`;
-            alert(`Identify Call Sent!\nUser: ${user.name}\nID: ${user.userId}`);
+            alert(`Identify Call Sent!\nUser: ${user.name}\nPhone: ${user.phone}`);
         }
 
         // 2. REGISTER (Alias + Identify)
@@ -223,13 +225,14 @@
             analytics.identify(user.userId, {
                 name: user.name,
                 email: user.email,
+                phone: user.phone,
                 position: user.position,
                 team: user.team,
                 signupMethod: 'Web Form'
             });
 
             document.getElementById('statusMessage').innerText = `🎉 Registered & Aliased as ${user.name} (ID: ${user.userId})`;
-            alert(`Alias + Identify Calls Sent!\nUser: ${user.name}\nID: ${user.userId}\n(Anonymous history now merged)`);
+            alert(`Alias + Identify Calls Sent!\nUser: ${user.name}\nPhone: ${user.phone}\n(Anonymous history now merged)`);
         }
 
         // 3. TRACK CALL: Product Viewed
